@@ -1,25 +1,28 @@
-package one.ifelse.springsecurity.apikey.authentication;
+package one.ifelse.tools.springauthsecretcode.authentication;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
-public class ApiKeyAuthenticationToken extends AbstractAuthenticationToken {
+import java.io.Serial;
 
+public class SecretCodeAuthenticationToken extends AbstractAuthenticationToken {
+
+    @Serial
     private static final long serialVersionUID = 2021112801L;
 
     private final Object principal;
 
     private Object credentials;
 
-    public ApiKeyAuthenticationToken(String apiKey) {
+    public SecretCodeAuthenticationToken(String code) {
         super(null);
-        this.principal = apiKey;
-        this.credentials = apiKey;
+        this.principal = code;
+        this.credentials = code;
         setAuthenticated(false);
     }
 
-    public ApiKeyAuthenticationToken(UserDetails userDetails) {
+    public SecretCodeAuthenticationToken(UserDetails userDetails) {
         super(userDetails.getAuthorities());
         this.principal = userDetails;
     }

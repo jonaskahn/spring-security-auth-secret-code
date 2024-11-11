@@ -1,7 +1,7 @@
-package one.ifelse.springsecurity.apikey.authentication;
+package one.ifelse.tools.springauthsecretcode.authentication;
 
 
-import one.ifelse.springsecurity.apikey.core.userdetails.ApiKeyUserDetailsService;
+import one.ifelse.tools.springauthsecretcode.core.userdetails.SecretCodeUserDetailsService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -15,17 +15,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.util.Assert;
 
-public class ExternalApiKeyAuthenticationProvider implements AuthenticationProvider,
+public class SecretCodeAuthenticationProvider implements AuthenticationProvider,
         InitializingBean, MessageSourceAware {
 
-    private final ApiKeyUserDetailsService apiKeyUserDetailsService;
+    private final SecretCodeUserDetailsService secretCodeUserDetailsService;
     private final UserDetailsChecker postAuthenticationChecks = new AccountStatusUserDetailsChecker();
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
-    public ExternalApiKeyAuthenticationProvider(
-            ApiKeyUserDetailsService apiKeyUserDetailsService
+    public SecretCodeAuthenticationProvider(
+            SecretCodeUserDetailsService secretCodeUserDetailsService
     ) {
-        this.apiKeyUserDetailsService = apiKeyUserDetailsService;
+        this.secretCodeUserDetailsService = secretCodeUserDetailsService;
     }
 
     /**
@@ -34,11 +34,11 @@ public class ExternalApiKeyAuthenticationProvider implements AuthenticationProvi
     @Override
     public Authentication authenticate(final Authentication authentication)
             throws AuthenticationException {
-        final ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
-        final String apiKey = (String) apiKeyAuthenticationToken.getPrincipal();
-        UserDetails user = apiKeyUserDetailsService.loadUserByApiKey(apiKey);
+        final SecretCodeAuthenticationToken secretCodeAuthenticationToken = (SecretCodeAuthenticationToken) authentication;
+        final String apiKey = (String) secretCodeAuthenticationToken.getPrincipal();
+        UserDetails user = secretCodeUserDetailsService.loadUserByApiKey(apiKey);
         postAuthenticationChecks.check(user);
-        return new ApiKeyAuthenticationToken(user);
+        return new SecretCodeAuthenticationToken(user);
     }
 
     /**
@@ -46,7 +46,7 @@ public class ExternalApiKeyAuthenticationProvider implements AuthenticationProvi
      */
     @Override
     public boolean supports(Class<?> authentication) {
-        return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
+        return SecretCodeAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
     /**
@@ -55,7 +55,7 @@ public class ExternalApiKeyAuthenticationProvider implements AuthenticationProvi
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(this.messages, "A message source must be set");
-        Assert.notNull(this.apiKeyUserDetailsService, "A apiKeyUserDetailsService must be set.");
+        Assert.notNull(this.secretCodeUserDetailsService, "A secretCodeUserDetailsService must be set.");
         Assert.notNull(this.postAuthenticationChecks, "A postAuthenticationChecks must be set.");
     }
 

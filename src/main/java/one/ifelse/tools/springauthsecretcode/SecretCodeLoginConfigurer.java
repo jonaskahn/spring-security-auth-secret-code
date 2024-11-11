@@ -1,8 +1,8 @@
-package one.ifelse.springsecurity.apikey;
+package one.ifelse.tools.springauthsecretcode;
 
 
-import one.ifelse.springsecurity.apikey.authentication.ExternalApiKeyAuthenticationProvider;
-import one.ifelse.springsecurity.apikey.core.userdetails.ApiKeyUserDetailsService;
+import one.ifelse.tools.springauthsecretcode.authentication.SecretCodeAuthenticationProvider;
+import one.ifelse.tools.springauthsecretcode.core.userdetails.SecretCodeUserDetailsService;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -10,16 +10,16 @@ import org.springframework.security.web.authentication.ui.DefaultLoginPageGenera
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-public final class ExternalApiKeyLoginConfigurer<H extends HttpSecurityBuilder<H>>
+public final class SecretCodeLoginConfigurer<H extends HttpSecurityBuilder<H>>
         extends
-        AbstractAuthenticationFilterConfigurer<H, ExternalApiKeyLoginConfigurer<H>,
-                ExternalUserLoginAuthenticationFilter> {
+        AbstractAuthenticationFilterConfigurer<H, SecretCodeLoginConfigurer<H>,
+                SecretCodeLoginAuthenticationFilter> {
 
-    private final ApiKeyUserDetailsService apiKeyUserDetailsService;
+    private final SecretCodeUserDetailsService secretCodeUserDetailsService;
 
-    public ExternalApiKeyLoginConfigurer(ApiKeyUserDetailsService apiKeyUserDetailsService) {
-        super(new ExternalUserLoginAuthenticationFilter(), "/login/key");
-        this.apiKeyUserDetailsService = apiKeyUserDetailsService;
+    public SecretCodeLoginConfigurer(SecretCodeUserDetailsService secretCodeUserDetailsService) {
+        super(new SecretCodeLoginAuthenticationFilter(), "/login/key");
+        this.secretCodeUserDetailsService = secretCodeUserDetailsService;
         apiKeyParameter("X-KEY");
     }
 
@@ -35,7 +35,7 @@ public final class ExternalApiKeyLoginConfigurer<H extends HttpSecurityBuilder<H
     }
 
     @Override
-    public ExternalApiKeyLoginConfigurer<H> loginPage(String loginPage) {
+    public SecretCodeLoginConfigurer<H> loginPage(String loginPage) {
         return super.loginPage(loginPage);
     }
 
@@ -46,8 +46,8 @@ public final class ExternalApiKeyLoginConfigurer<H extends HttpSecurityBuilder<H
     public void init(H http) throws Exception {
         super.init(http);
 
-        ExternalApiKeyAuthenticationProvider authenticationProvider = new ExternalApiKeyAuthenticationProvider(
-                apiKeyUserDetailsService);
+        SecretCodeAuthenticationProvider authenticationProvider = new SecretCodeAuthenticationProvider(
+                secretCodeUserDetailsService);
         postProcess(authenticationProvider);
         http.authenticationProvider(authenticationProvider);
 
@@ -75,7 +75,7 @@ public final class ExternalApiKeyLoginConfigurer<H extends HttpSecurityBuilder<H
         }
     }
 
-    public ExternalApiKeyLoginConfigurer<H> apiKeyParameter(String apiKey) {
+    public SecretCodeLoginConfigurer<H> apiKeyParameter(String apiKey) {
         getAuthenticationFilter().setApiKey(apiKey);
         return this;
     }
