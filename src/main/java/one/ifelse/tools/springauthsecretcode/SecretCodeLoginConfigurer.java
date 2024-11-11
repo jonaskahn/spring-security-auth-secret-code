@@ -3,6 +3,7 @@ package one.ifelse.tools.springauthsecretcode;
 
 import one.ifelse.tools.springauthsecretcode.authentication.SecretCodeAuthenticationProvider;
 import one.ifelse.tools.springauthsecretcode.core.userdetails.SecretCodeUserDetailsService;
+
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -11,72 +12,74 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 public final class SecretCodeLoginConfigurer<H extends HttpSecurityBuilder<H>>
-        extends
-        AbstractAuthenticationFilterConfigurer<H, SecretCodeLoginConfigurer<H>,
-                SecretCodeLoginAuthenticationFilter> {
+		extends
+		AbstractAuthenticationFilterConfigurer<H, SecretCodeLoginConfigurer<H>,
+				SecretCodeLoginAuthenticationFilter> {
 
-    private final SecretCodeUserDetailsService secretCodeUserDetailsService;
+	private final SecretCodeUserDetailsService secretCodeUserDetailsService;
 
-    public SecretCodeLoginConfigurer(SecretCodeUserDetailsService secretCodeUserDetailsService) {
-        super(new SecretCodeLoginAuthenticationFilter(), "/login/key");
-        this.secretCodeUserDetailsService = secretCodeUserDetailsService;
-        secretCodeParameter("X-KEY");
-    }
+	private final SecretCodeGenerator secretCodeGenerator;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void configure(H http) throws Exception {
-        http.addFilterAfter(getAuthenticationFilter(),
-                UsernamePasswordAuthenticationFilter.class);
+	public SecretCodeLoginConfigurer(SecretCodeUserDetailsService secretCodeUserDetailsService, SecretCodeGenerator secretCodeGenerator) {
+		super(new SecretCodeLoginAuthenticationFilter(), "/login/key");
+		this.secretCodeUserDetailsService = secretCodeUserDetailsService;
+		this.secretCodeGenerator = secretCodeGenerator;
+		secretCodeParameter("X-KEY");
+	}
 
-        super.configure(http);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void configure(H http) throws Exception {
+		http.addFilterAfter(getAuthenticationFilter(),
+				UsernamePasswordAuthenticationFilter.class);
 
-    @Override
-    public SecretCodeLoginConfigurer<H> loginPage(String loginPage) {
-        return super.loginPage(loginPage);
-    }
+		super.configure(http);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void init(H http) throws Exception {
-        super.init(http);
+	@Override
+	public SecretCodeLoginConfigurer<H> loginPage(String loginPage) {
+		return super.loginPage(loginPage);
+	}
 
-        SecretCodeAuthenticationProvider authenticationProvider = new SecretCodeAuthenticationProvider(
-                secretCodeUserDetailsService);
-        postProcess(authenticationProvider);
-        http.authenticationProvider(authenticationProvider);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void init(H http) throws Exception {
+		super.init(http);
 
-        initDefaultLoginFilter(http);
-    }
+		SecretCodeAuthenticationProvider authenticationProvider = new SecretCodeAuthenticationProvider(secretCodeUserDetailsService, secretCodeGenerator);
+		postProcess(authenticationProvider);
+		http.authenticationProvider(authenticationProvider);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected RequestMatcher createLoginProcessingUrlMatcher(
-            String loginProcessingUrl) {
-        return new AntPathRequestMatcher(loginProcessingUrl, "POST");
-    }
+		initDefaultLoginFilter(http);
+	}
 
-    private void initDefaultLoginFilter(H http) {
-        DefaultLoginPageGeneratingFilter loginPageGeneratingFilter = http
-                .getSharedObject(DefaultLoginPageGeneratingFilter.class);
-        if (loginPageGeneratingFilter != null && !isCustomLoginPage()) {
-            String loginPageUrl = loginPageGeneratingFilter.getLoginPageUrl();
-            if (loginPageUrl == null) {
-                loginPageGeneratingFilter.setLoginPageUrl(getLoginPage());
-                loginPageGeneratingFilter.setFailureUrl(getFailureUrl());
-            }
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected RequestMatcher createLoginProcessingUrlMatcher(
+			String loginProcessingUrl) {
+		return new AntPathRequestMatcher(loginProcessingUrl, "POST");
+	}
 
-    public SecretCodeLoginConfigurer<H> secretCodeParameter(String secretCode) {
-        getAuthenticationFilter().setSecretCode(secretCode);
-        return this;
-    }
+	private void initDefaultLoginFilter(H http) {
+		DefaultLoginPageGeneratingFilter loginPageGeneratingFilter = http
+				.getSharedObject(DefaultLoginPageGeneratingFilter.class);
+		if (loginPageGeneratingFilter != null && !isCustomLoginPage()) {
+			String loginPageUrl = loginPageGeneratingFilter.getLoginPageUrl();
+			if (loginPageUrl == null) {
+				loginPageGeneratingFilter.setLoginPageUrl(getLoginPage());
+				loginPageGeneratingFilter.setFailureUrl(getFailureUrl());
+			}
+		}
+	}
+
+	public SecretCodeLoginConfigurer<H> secretCodeParameter(String secretCode) {
+		getAuthenticationFilter().setSecretCode(secretCode);
+		return this;
+	}
 }

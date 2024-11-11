@@ -4,5 +4,5 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface SecretCodeUserDetailsService {
 
-    UserDetails loadUserBySecretCode(String secretCode) throws SecretCodeUserInfoNotFoundException;
+	UserDetails loadUserBySecretCode(String secretCode) throws SecretCodeInvalidException;
 }

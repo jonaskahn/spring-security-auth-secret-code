@@ -4,5 +4,7 @@ public interface SecretCodeGenerator {
 
 	String generate();
 
-	boolean matches(String code);
+	default boolean valid(String code) {
+		return true;
+	}
 }
