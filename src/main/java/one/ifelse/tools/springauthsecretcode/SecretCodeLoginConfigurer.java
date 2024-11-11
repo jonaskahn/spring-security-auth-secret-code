@@ -20,7 +20,7 @@ public final class SecretCodeLoginConfigurer<H extends HttpSecurityBuilder<H>>
     public SecretCodeLoginConfigurer(SecretCodeUserDetailsService secretCodeUserDetailsService) {
         super(new SecretCodeLoginAuthenticationFilter(), "/login/key");
         this.secretCodeUserDetailsService = secretCodeUserDetailsService;
-        apiKeyParameter("X-KEY");
+        secretCodeParameter("X-KEY");
     }
 
     /**
@@ -75,8 +75,8 @@ public final class SecretCodeLoginConfigurer<H extends HttpSecurityBuilder<H>>
         }
     }
 
-    public SecretCodeLoginConfigurer<H> apiKeyParameter(String apiKey) {
-        getAuthenticationFilter().setApiKey(apiKey);
+    public SecretCodeLoginConfigurer<H> secretCodeParameter(String secretCode) {
+        getAuthenticationFilter().setSecretCode(secretCode);
         return this;
     }
 }

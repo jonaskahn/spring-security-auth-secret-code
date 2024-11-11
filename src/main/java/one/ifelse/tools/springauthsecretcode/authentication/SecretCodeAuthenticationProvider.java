@@ -35,8 +35,8 @@ public class SecretCodeAuthenticationProvider implements AuthenticationProvider,
     public Authentication authenticate(final Authentication authentication)
             throws AuthenticationException {
         final SecretCodeAuthenticationToken secretCodeAuthenticationToken = (SecretCodeAuthenticationToken) authentication;
-        final String apiKey = (String) secretCodeAuthenticationToken.getPrincipal();
-        UserDetails user = secretCodeUserDetailsService.loadUserByApiKey(apiKey);
+        final String secretCode = (String) secretCodeAuthenticationToken.getPrincipal();
+        UserDetails user = secretCodeUserDetailsService.loadUserBySecretCode(secretCode);
         postAuthenticationChecks.check(user);
         return new SecretCodeAuthenticationToken(user);
     }

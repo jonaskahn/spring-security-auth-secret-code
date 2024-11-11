@@ -14,9 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 public class SecretCodeLoginAuthenticationFilter
         extends AbstractAuthenticationProcessingFilter {
 
-    public static final String SPRING_SECURITY_FORM_API_KEY = "X-KEY";
+    public static final String SPRING_SECURITY_FORM_SECRET_CODE = "X-CODE";
 
-    private String apiKeyParameter = SPRING_SECURITY_FORM_API_KEY;
+    private String secretCodeParam = SPRING_SECURITY_FORM_SECRET_CODE;
 
     public SecretCodeLoginAuthenticationFilter() {
         super(new AntPathRequestMatcher("/login/key", "POST"));
@@ -33,16 +33,16 @@ public class SecretCodeLoginAuthenticationFilter
                     "Authentication method not supported: " + request.getMethod());
         }
 
-        final String apiKey = request.getParameter(apiKeyParameter);
+        final String secretCode = request.getParameter(secretCodeParam);
 
-        final SecretCodeAuthenticationToken authRequest = new SecretCodeAuthenticationToken(apiKey);
+        final SecretCodeAuthenticationToken authRequest = new SecretCodeAuthenticationToken(secretCode);
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
         return this.getAuthenticationManager().authenticate(authRequest);
     }
 
-    public void setApiKey(String apiKeyParameter) {
-        Assert.hasText(apiKeyParameter, "X-KEY parameter must not be empty or null");
-        this.apiKeyParameter = apiKeyParameter;
+    public void setSecretCode(String secretCodeParam) {
+        Assert.hasText(secretCodeParam, "X-CODE parameter must not be empty or null");
+        this.secretCodeParam = secretCodeParam;
     }
 
 }
